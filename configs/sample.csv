@@ -1,0 +1,2 @@
+sample,agp,scaffold_fasta,HiFi,HiC1,HiC2,ploidy,chrom,haplomeSize,compleasm_lineage_odb
+PopA,/path/to/map.agp,/path/to/scaffold/fasta,/path/to/hifi/reads/{.bam or .fastq or .fastq.gz},/path/to/HiC1/reads/{.fastq.gz or .fq.gz},/path/to/HiC1/reads/{.fastq.gz or .fq.gz},4,210000000,brassicales_odb12
