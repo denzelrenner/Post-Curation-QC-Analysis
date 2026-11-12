@@ -89,7 +89,7 @@ rule summarise_basicstats_qc_single_sample:
         qcSummary='{sample}/s3_basic_stats_qc/qc_summary/{sample}_basicstats_qc.xlsx',
     params:
         qcScript=os.path.join(config['script_dir'],'python_scripts','create_qc_summary.py'),
-        ploidy=lambda w:sampleInfo[w.sample]['ploidy']+1,
+        haplomeNames=lambda w:sampleInfo[w.sample]['ploidyAsArray'] + ['Debris']
     resources:
         runtime=30,
         mem_mb=1000,
@@ -104,6 +104,6 @@ rule summarise_basicstats_qc_single_sample:
         export PATH=$CONDA_PREFIX/bin:$PATH
 
         # run qc summary excel file
-        python3 {params.qcScript} -s {wildcards.sample} -nhap {params.ploidy} -o {wildcards.sample}_basicstats_qc -od {wildcards.sample}/s3_basic_stats_qc/qc_summary
+        python3 {params.qcScript} -s {wildcards.sample} -nhap {params.haplomeNames} -o {wildcards.sample}_basicstats_qc -od {wildcards.sample}/s3_basic_stats_qc/qc_summary
         '''
 

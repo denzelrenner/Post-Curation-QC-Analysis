@@ -22,7 +22,7 @@ vars = argparse.ArgumentParser(description='Create summary statistics from gfast
 
 vars.add_argument('-s','--samples',dest='sample',nargs='+', type=str, required=True, help='sample(s) to process stats for')
 
-vars.add_argument('-nhap',dest='haplomeNumber',nargs='+', type=int, required=True, help='number of haplomes (+1 to include the debris)')
+vars.add_argument('-nhap',dest='haplomeNames',nargs='+', type=str, required=True, help='name of haplomes')
 
 vars.add_argument('-o','--output_prefix',dest='outputPrefix', type=str, required=False,default='output', help='prefix for the output file')
 
@@ -131,7 +131,7 @@ def compleasm_to_df(haplome_name:str,file:str):
     return pd.DataFrame(MainSummaryTable)
 
 # make pairs of sample and haplome number
-sample_haplome = list(zip(args.sample,args.haplomeNumber))
+sample_haplome = [(args.sample,args.haplomeNames)]
 
 # run different analysis depending on if we have a single sample or many
 if len(sample_haplome) == 1:
@@ -142,7 +142,7 @@ if len(sample_haplome) == 1:
 
     for s,h in sample_haplome:
         
-        for i in range(1,h+1):
+        for i in h:
 
             # get haplome name
             haplome = f'{s}.hap{i}'
@@ -181,7 +181,7 @@ elif len(sample_haplome) > 1:
     
     for s,h in sample_haplome:
 
-        for i in range(1,h+1):
+        for i in h:
 
             # get haplome name
             haplome = f'{s}.hap{i}'

@@ -1,6 +1,38 @@
+rule create_uniform_name_for_input_fasta:
+    input:
+        done='{sample}/s1_agp_to_fasta/.done.txt',
+    output:
+        fa='{sample}/s1_agp_to_fasta/renamed_main_scaffold_file/{sample}.hap{haplomeNumber}.fa',
+    params:
+        ploidy=lambda w: sampleInfo[w.sample]['ploidy']
+    threads:
+        1
+    resources:
+        mem_mb=1000,
+        runtime=20,
+    wildcard_constraints:
+        haplomeNumber="\d+"
+    localrule:
+        True
+    shell:
+        '''
+        export PATH=$CONDA_PREFIX/bin:$PATH
+
+        # depending on the ploidy the output fastas look a little different
+        if [ "{params.ploidy}" -eq "2" ];then
+
+            cp {wildcards.sample}/s1_agp_to_fasta/{wildcards.sample}.hap{wildcards.haplomeNumber}.1.primary.curated.fa {output.fa}
+
+        elif [ "{params.ploidy}" -gt "2" ];then
+
+            cp {wildcards.sample}/s1_agp_to_fasta/{wildcards.sample}.1.hap{wildcards.haplomeNumber}s.curated.fa {output.fa}
+
+        fi
+        '''
+
 rule align_fasta_to_ref:
     input:
-        fa=lambda w: f'{w.sample}/s1_agp_to_fasta/{w.sample}.hap{{haplomeNumber}}.1.primary.curated.fa' if sampleInfo[w.sample]['ploidy'] == 2 else f'{w.sample}/s1_agp_to_fasta/{w.sample}.1.hap{{haplomeNumber}}s.curated.fa',
+        fa='{sample}/s1_agp_to_fasta/renamed_main_scaffold_file/{sample}.hap{haplomeNumber}.fa',
         done='{sample}/s1_agp_to_fasta/.done.txt',
     output:
         coords='{sample}/s2_rename_reorient_fastas/{sample}_Haplome{haplomeNumber}/align_fasta_to_ref/output.coords',
@@ -32,7 +64,7 @@ rule align_fasta_to_ref:
 
 rule rename_reorient_fasta:
     input:
-        fa=lambda w: f'{w.sample}/s1_agp_to_fasta/{w.sample}.hap{{haplomeNumber}}.1.primary.curated.fa' if sampleInfo[w.sample]['ploidy'] == 2 else f'{w.sample}/s1_agp_to_fasta/{w.sample}.1.hap{{haplomeNumber}}s.curated.fa',
+        fa='{sample}/s1_agp_to_fasta/renamed_main_scaffold_file/{sample}.hap{haplomeNumber}.fa',
         coords_idx='{sample}/s2_rename_reorient_fastas/{sample}_Haplome{haplomeNumber}/align_fasta_to_ref/output.coords.idx',
     output:
         outFa='{sample}/s2_rename_reorient_fastas/{sample}_Haplome{haplomeNumber}/corrected_fasta/{sample}_Haplome{haplomeNumber}.fa',
