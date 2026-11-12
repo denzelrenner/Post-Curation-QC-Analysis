@@ -35,15 +35,11 @@ rule align_fasta_to_ref:
         fa='{sample}/s1_agp_to_fasta/renamed_main_scaffold_file/{sample}.hap{haplomeNumber}.fa',
         done='{sample}/s1_agp_to_fasta/.done.txt',
     output:
-        coords='{sample}/s2_rename_reorient_fastas/{sample}_Haplome{haplomeNumber}/align_fasta_to_ref/output.coords',
-        coords_idx='{sample}/s2_rename_reorient_fastas/{sample}_Haplome{haplomeNumber}/align_fasta_to_ref/output.coords.idx',
         delta='{sample}/s2_rename_reorient_fastas/{sample}_Haplome{haplomeNumber}/align_fasta_to_ref/output.delta',
-        deltagz='{sample}/s2_rename_reorient_fastas/{sample}_Haplome{haplomeNumber}/align_fasta_to_ref/output.uniqueAnchorFiltered_l10000.delta.gz',
     conda:
         "../../envs/mummer.yml"
     params:
         ref=lambda w: sampleInfo[w.sample]['reference_fasta'],
-        dotPrepScript=os.path.join(config['script_dir'],'python_scripts','DotPrep.py')
     threads:
         8
     resources:
@@ -57,9 +53,34 @@ rule align_fasta_to_ref:
 
         # align fasta to ref
         nucmer -t {threads} --prefix={wildcards.sample}/s2_rename_reorient_fastas/{wildcards.sample}_Haplome{wildcards.haplomeNumber}/align_fasta_to_ref/output {params.ref} {input.fa}
+        '''
 
+rule create_coords_file:
+    input:
+        delta='{sample}/s2_rename_reorient_fastas/{sample}_Haplome{haplomeNumber}/align_fasta_to_ref/output.delta'
+    output:
+        coords='{sample}/s2_rename_reorient_fastas/{sample}_Haplome{haplomeNumber}/align_fasta_to_ref/output.coords',
+        coords_idx='{sample}/s2_rename_reorient_fastas/{sample}_Haplome{haplomeNumber}/align_fasta_to_ref/output.coords.idx',
+        deltagz='{sample}/s2_rename_reorient_fastas/{sample}_Haplome{haplomeNumber}/align_fasta_to_ref/output.uniqueAnchorFiltered_l10000.delta.gz',
+    conda:
+        "../../envs/pd-tools.yml"
+    params:
+        dotPrepScript=os.path.join(config['script_dir'],'python_scripts','DotPrep.py')
+    threads:
+        2
+    localrule:
+        True
+    resources:
+        mem_mb=1000,
+        runtime=120,
+    wildcard_constraints:
+        haplomeNumber=r"\d+"
+    shell:
+        '''
+        export PATH=$CONDA_PREFIX/bin:$PATH
+        
         # needs python 3.6
-        {params.dotPrepScript} --delta {output.delta}
+        {params.dotPrepScript} --delta {output.delta} --out {wildcards.sample}/s2_rename_reorient_fastas/{wildcards.sample}_Haplome{wildcards.haplomeNumber}/align_fasta_to_ref/output
         '''
 
 rule rename_reorient_fasta:
