@@ -30,13 +30,15 @@ def get_scaffolding_debris(w):
 
 rule combine_debris_fasta:
     input:
-        fa=lambda w: get_scaffolding_debris,
+        fa=get_scaffolding_debris,
         step1Done='{sample}/s1_agp_to_fasta/.done.txt', 
     output:
-        complete'{sample}/s2_rename_reorient_fastas/.done.txt'
+        complete='{sample}/s2_rename_reorient_fastas/.get_debris.txt',
     resources:
         mem_mb=1000,
         runtime=30,
+    threads:
+        1
     params:
         debrisHapNumber=lambda w:sampleInfo[w.sample]['ploidy'] + 1,
     localrule:

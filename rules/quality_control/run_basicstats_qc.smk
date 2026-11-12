@@ -55,6 +55,7 @@ rule download_compleasm_lineages:
 
 rule basicstats_qc_on_individual_haplome:
     input:
+        complete='{sample}/s2_rename_reorient_fastas/.get_debris.txt',
         fa='{sample}/s2_rename_reorient_fastas/{sample}_Haplome{haplomeNumber}/corrected_fasta/{sample}_Haplome{haplomeNumber}.fa',
         compleasm_lineage_download=lambda w: os.path.join(f"{config['compleasm_download_path']}",f"{sampleInfo[w.sample]['compleasm_lineage_odb']}.done"),
     output:
