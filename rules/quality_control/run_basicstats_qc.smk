@@ -55,7 +55,6 @@ rule download_compleasm_lineages:
 
 rule basicstats_qc_on_individual_haplome:
     input:
-        complete='{sample}/s2_rename_reorient_fastas/.get_debris.txt',
         fa='{sample}/s2_rename_reorient_fastas/{sample}_Haplome{haplomeNumber}/corrected_fasta/{sample}_Haplome{haplomeNumber}.fa',
         compleasm_lineage_download=lambda w: os.path.join(f"{config['compleasm_download_path']}",f"{sampleInfo[w.sample]['compleasm_lineage_odb']}.done"),
     output:
@@ -84,8 +83,8 @@ rule basicstats_qc_on_individual_haplome:
 
 rule summarise_basicstats_qc_single_sample:
     input:
-        compleasm=lambda w:expand(f'{w.sample}/s3_basic_stats_qc/{w.sample}_Haplome{{hapNum}}/compleasm/summary.txt',hapNum=sampleInfo[w.sample]['withDebrisPloidyAsArray']),
-        gfastats=lambda w:expand(f'{w.sample}/s3_basic_stats_qc/{w.sample}_Haplome{{hapNum}}/gfastats/stats.txt',hapNum=sampleInfo[w.sample]['withDebrisPloidyAsArray']),
+        compleasm=lambda w:expand(f'{w.sample}/s3_basic_stats_qc/{w.sample}_Haplome{{hapNum}}/compleasm/summary.txt',hapNum=sampleInfo[w.sample]['ploidyAsArray'] + ['Debris']),
+        gfastats=lambda w:expand(f'{w.sample}/s3_basic_stats_qc/{w.sample}_Haplome{{hapNum}}/gfastats/stats.txt',hapNum=sampleInfo[w.sample]['ploidyAsArray'] + ['Debris']),
     output:
         qcSummary='{sample}/s3_basic_stats_qc/qc_summary/{sample}_basicstats_qc.xlsx',
     params:

@@ -33,7 +33,7 @@ rule combine_debris_fasta:
         fa=get_scaffolding_debris,
         step1Done='{sample}/s1_agp_to_fasta/.done.txt', 
     output:
-        complete='{sample}/s2_rename_reorient_fastas/.get_debris.txt',
+        '{sample}/s2_rename_reorient_fastas/{sample}_HaplomeDebris/corrected_fasta/{sample}_HaplomeDebris.fa',
     resources:
         mem_mb=1000,
         runtime=30,
@@ -49,7 +49,5 @@ rule combine_debris_fasta:
         mkdir -p {wildcards.sample}/s2_rename_reorient_fastas/{wildcards.sample}_Haplome{params.debrisHapNumber}/corrected_fasta
 
         # combine debris fastas
-        cat {input.fa} > {wildcards.sample}/s2_rename_reorient_fastas/{wildcards.sample}_Haplome{params.debrisHapNumber}/corrected_fasta/{wildcards.sample}_Haplome{params.debrisHapNumber}.fa
-
-        echo 'done' > {output.complete}
+        cat {input.fa} > {output}
         '''

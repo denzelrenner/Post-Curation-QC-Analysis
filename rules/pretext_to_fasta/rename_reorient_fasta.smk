@@ -17,6 +17,8 @@ rule align_fasta_to_ref:
     resources:
         mem_mb=20000,
         runtime=720,
+    wildcard_constraints:
+        haplomeNumber="\d+"
     shell:
         '''
         export PATH=$CONDA_PREFIX/bin:$PATH
@@ -48,6 +50,8 @@ rule rename_reorient_fasta:
         runtime=30,
     localrule:
         True
+    wildcard_constraints:
+        haplomeNumber="\d+"
     shell:
         '''
         export PATH=$CONDA_PREFIX/bin:$PATH
