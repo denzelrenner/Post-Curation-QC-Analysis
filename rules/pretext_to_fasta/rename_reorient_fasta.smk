@@ -11,7 +11,7 @@ rule create_uniform_name_for_input_fasta:
         mem_mb=1000,
         runtime=20,
     wildcard_constraints:
-        haplomeNumber="\d+"
+        haplomeNumber=r"\d+"
     localrule:
         True
     shell:
@@ -50,7 +50,7 @@ rule align_fasta_to_ref:
         mem_mb=20000,
         runtime=720,
     wildcard_constraints:
-        haplomeNumber="\d+"
+        haplomeNumber=r"\d+"
     shell:
         '''
         export PATH=$CONDA_PREFIX/bin:$PATH
@@ -83,7 +83,7 @@ rule rename_reorient_fasta:
     localrule:
         True
     wildcard_constraints:
-        haplomeNumber="\d+"
+        haplomeNumber=r"\d+"
     shell:
         '''
         export PATH=$CONDA_PREFIX/bin:$PATH
