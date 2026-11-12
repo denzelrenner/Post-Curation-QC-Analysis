@@ -2,7 +2,7 @@ import os
 
 rule combine_debris_fasta:
     input:
-        fa=lambda w:expand(f'{w.sample}/s1_agp_to_fasta/renamed_main_scaffold_file/{w.sample}.hap{{hapNum}}.fa',hapNum=sampleInfo[w.sample]['ploidy'])
+        fa=lambda w:expand(f'{w.sample}/s1_agp_to_fasta/renamed_main_scaffold_file/{w.sample}.hap{{hapNum}}.fa',hapNum=sampleInfo[w.sample]['ploidyAsArray']),
         step1Done='{sample}/s1_agp_to_fasta/.done.txt', 
     output:
         '{sample}/s2_rename_reorient_fastas/{sample}_HaplomeDebris/corrected_fasta/{sample}_HaplomeDebris.fa',

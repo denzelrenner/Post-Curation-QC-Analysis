@@ -35,6 +35,7 @@ rule agp_to_fasta:
     params:
         ploidy=lambda w: sampleInfo[w.sample]['ploidy'],
         pretextAsmScript=os.path.join(config['script_dir'],'python_scripts','DotPrep.py'),
+        outdir='{sample}/s1_agp_to_fasta'
     resources:
         mem_mb=1000,
         runtime=30,
@@ -45,7 +46,7 @@ rule agp_to_fasta:
         export PATH=$CONDA_PREFIX/bin:$PATH
 
         # pretext to asm
-        pretext-to-asm -a {input.fa} -p {input.agp} -c Chr -o {output}/{wildcards.sample}.1.fa
+        pretext-to-asm -a {input.fa} -p {input.agp} -c Chr -o {params.outdir}/{wildcards.sample}.1.fa
 
         # depending on the ploidy the output fastas look a little different
         if [ "{params.ploidy}" -eq "2" ];then
