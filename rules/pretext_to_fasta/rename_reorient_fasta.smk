@@ -11,6 +11,7 @@ rule align_fasta_to_ref:
         "../../envs/mummer.yml"
     params:
         ref=lambda w: sampleInfo[w.sample]['reference_fasta'],
+        dotPrepScript=os.path.join(config['script_dir'],'python_scripts','DotPrep.py')
     threads:
         8
     resources:
@@ -24,7 +25,7 @@ rule align_fasta_to_ref:
         nucmer -t {threads} --prefix=output {params.ref} {input.fa}
 
         # needs python 3.6
-        DotPrep.py --delta {output.delta}
+        {params.dotPrepScript} --delta {output.delta}
         '''
 
 rule rename_reorient_fasta:

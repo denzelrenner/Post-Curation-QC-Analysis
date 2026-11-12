@@ -1,16 +1,15 @@
-rule agp_to_fasta:
+rule index_scaffold_fasta:
     input:
-        agp=lambda w: sampleInfo[w.sample]['agp'],
         fa=lambda w: sampleInfo[w.sample]['scaffold_fasta'],
     output:
-        done='{sample}/s1_agp_to_fasta/.done.txt'
+        fai='{sample}/s1_agp_to_fasta/.indexed.txt'
     conda:
         "../../envs/mapping-tools.yml"
-    params:
-        ploidy=lambda w: sampleInfo[w.sample]['ploidy'],
     resources:
         mem_mb=1000,
         runtime=30,
+    threads:
+        4
     localrule:
         True
     shell:
@@ -20,6 +19,32 @@ rule agp_to_fasta:
         # index scaffold fasta
         samtools faidx {input.fa}
 
+        echo 'done' > {output.fai}
+        '''
+
+
+rule agp_to_fasta:
+    input:
+        agp=lambda w: sampleInfo[w.sample]['agp'],
+        fa=lambda w: sampleInfo[w.sample]['scaffold_fasta'],
+        indexDone='{sample}/s1_agp_to_fasta/.indexed.txt'
+    output:
+        done='{sample}/s1_agp_to_fasta/.done.txt'
+    conda:
+        "../../envs/agp-utils.yml"
+    params:
+        ploidy=lambda w: sampleInfo[w.sample]['ploidy'],
+        pretextAsmScript=os.path.join(config['script_dir'],'python_scripts','DotPrep.py'),
+    resources:
+        mem_mb=1000,
+        runtime=30,
+    localrule:
+        True
+    shell:
+        '''
+        export PATH=$CONDA_PREFIX/bin:$PATH
+
+        # pretext to asm
         pretext-to-asm -a {input.fa} -p {input.agp} -c Chr -o {output}/{wildcards.sample}.1.fa
 
         # depending on the ploidy the output fastas look a little different
