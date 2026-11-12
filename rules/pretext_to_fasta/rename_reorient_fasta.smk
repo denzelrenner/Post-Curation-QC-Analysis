@@ -21,11 +21,11 @@ rule create_uniform_name_for_input_fasta:
         # depending on the ploidy the output fastas look a little different
         if [ "{params.ploidy}" -eq "2" ];then
 
-            mv {wildcards.sample}/s1_agp_to_fasta/{wildcards.sample}.hap{wildcards.haplomeNumber}.1.primary.curated.fa {output.fa}
+            mv {wildcards.sample}/s1_agp_to_fasta/{wildcards.sample}.hap{wildcards.haplomeNumber}.1.*.fa {output.fa}
 
         elif [ "{params.ploidy}" -gt "2" ];then
 
-            mv {wildcards.sample}/s1_agp_to_fasta/{wildcards.sample}.1.hap{wildcards.haplomeNumber}s.curated.fa {output.fa}
+            mv {wildcards.sample}/s1_agp_to_fasta/{wildcards.sample}.1.hap{wildcards.haplomeNumber}s.*.fa {output.fa}
 
         fi
         '''
