@@ -53,20 +53,20 @@ rule agp_to_fasta:
         # depending on the ploidy the output fastas look a little different
         if [ "{params.ploidy}" -eq "2" ];then
 
-            fastaFiles=({params.outdir}/{wildcards.sample}.hap*.1.*.fa)
+            fastaFiles=({params.outdir}/{wildcards.sample}.hap*.1*.fa)
             numOfFastaFiles=${{#fastaFiles[@]}}
 
             if [ "$numOfFastaFiles" -eq "{params.ploidy}" ];then
-                echo 'All Fasta Files Present' > {output}
+                ls {params.outdir}/{wildcards.sample}.hap*.1*.fa > {output}
             fi
 
         elif [ "{params.ploidy}" -gt "2" ];then
 
-            fastaFiles=({params.outdir}/{wildcards.sample}.1.hap*s.*.fa)
+            fastaFiles=({params.outdir}/{wildcards.sample}.1.hap*s*.fa)
             numOfFastaFiles=${{#fastaFiles[@]}}
 
             if [ "$numOfFastaFiles" -eq "{params.ploidy}" ];then
-                echo 'All Fasta Files Present' > {output}
+                ls {params.outdir}/{wildcards.sample}.1.hap*s*.fa > {output}
             fi
         
         fi

@@ -21,11 +21,11 @@ rule create_uniform_name_for_input_fasta:
         # depending on the ploidy the output fastas look a little different
         if [ "{params.ploidy}" -eq "2" ];then
 
-            mv {wildcards.sample}/s1_agp_to_fasta/{wildcards.sample}.hap{wildcards.haplomeNumber}.1.*.fa {output.fa}
+            mv {wildcards.sample}/s1_agp_to_fasta/{wildcards.sample}.hap{wildcards.haplomeNumber}.1*.fa {output.fa}
 
         elif [ "{params.ploidy}" -gt "2" ];then
 
-            mv {wildcards.sample}/s1_agp_to_fasta/{wildcards.sample}.1.hap{wildcards.haplomeNumber}s.*.fa {output.fa}
+            mv {wildcards.sample}/s1_agp_to_fasta/{wildcards.sample}.1.hap{wildcards.haplomeNumber}s*.fa {output.fa}
 
         fi
         '''
@@ -56,7 +56,7 @@ rule align_fasta_to_ref:
         export PATH=$CONDA_PREFIX/bin:$PATH
 
         # align fasta to ref
-        nucmer -t {threads} --prefix=output {params.ref} {input.fa}
+        nucmer -t {threads} --prefix={wildcards.sample}/s2_rename_reorient_fastas/{wildcards.sample}_Haplome{wildcards.haplomeNumber}/align_fasta_to_ref/output {params.ref} {input.fa}
 
         # needs python 3.6
         {params.dotPrepScript} --delta {output.delta}
