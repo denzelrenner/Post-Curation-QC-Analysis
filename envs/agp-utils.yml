@@ -41,7 +41,7 @@ dependencies:
       - indexed-gzip==1.10.3
       - lazy-importer==0.1.0
       - pyyaml==6.0.3
-      - tola-agp-tpf-utils==1.4.1
+      - git+https://github.com/sanger-tol/agp-tpf-utils
       - zipp==4.1.2
       - zlib-ng==1.1.0
 prefix: /proj/slu2026-1-5/Denzel/miniconda3/envs/agp-utils

@@ -35,7 +35,9 @@ rule agp_to_fasta:
     params:
         ploidy=lambda w: sampleInfo[w.sample]['ploidy'],
         pretextAsmScript=os.path.join(config['script_dir'],'python_scripts','DotPrep.py'),
-        outdir='{sample}/s1_agp_to_fasta'
+        outdir='{sample}/s1_agp_to_fasta',
+    log:
+        out='{sample}/s1_agp_to_fasta/pretext_to_asm.log',
     resources:
         mem_mb=1000,
         runtime=30,
@@ -46,7 +48,7 @@ rule agp_to_fasta:
         export PATH=$CONDA_PREFIX/bin:$PATH
 
         # pretext to asm
-        pretext-to-asm -a {input.fa} -p {input.agp} -c Chr -o {params.outdir}/{wildcards.sample}.1.fa
+        pretext-to-asm -a {input.fa} -p {input.agp} -c Chr -o {params.outdir}/{wildcards.sample}.1.fa > {log.out} 2>&1
 
         # depending on the ploidy the output fastas look a little different
         if [ "{params.ploidy}" -eq "2" ];then
@@ -55,7 +57,7 @@ rule agp_to_fasta:
             numOfFastaFiles=${{#fastaFiles[@]}}
 
             if [ "$numOfFastaFiles" -eq "{params.ploidy}" ];then
-                echo 'All Fasta Files Present' > done.txt
+                echo 'All Fasta Files Present' > {output}
             fi
 
         elif [ "{params.ploidy}" -gt "2" ];then
@@ -64,7 +66,7 @@ rule agp_to_fasta:
             numOfFastaFiles=${{#fastaFiles[@]}}
 
             if [ "$numOfFastaFiles" -eq "{params.ploidy}" ];then
-                echo 'All Fasta Files Present' > done.txt
+                echo 'All Fasta Files Present' > {output}
             fi
         
         fi
