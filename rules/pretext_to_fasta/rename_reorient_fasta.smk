@@ -114,3 +114,26 @@ rule rename_reorient_fasta:
 
         python3 {params.qcScript} -s {wildcards.sample} --sample_fasta {input.fa} --ref_fasta {params.ref} -nhap {wildcards.haplomeNumber} -c {input.coords_idx} -o {params.xlsxPrefix} -od {params.outdir}
         '''
+
+rule index_final_fasta:
+    input:
+        fa='{sample}/s2_rename_reorient_fastas/{sample}_Haplome{haplomeNumber}/corrected_fasta/{sample}_Haplome{haplomeNumber}.fa',
+    output:
+        fai='{sample}/s2_rename_reorient_fastas/{sample}_Haplome{haplomeNumber}/corrected_fasta/{sample}_Haplome{haplomeNumber}.fa.fai',
+    conda:
+        "../../envs/mapping-tools.yml",
+    threads:
+        1
+    resources:
+        mem_mb=1000,
+        runtime=60,
+    localrule:
+        True
+    wildcard_constraints:
+        haplomeNumber=r"\d+"
+    shell:
+        '''
+        export PATH=$CONDA_PREFIX/bin:$PATH
+
+        samtools faidx {input.fa} -o {output.fai}
+        '''

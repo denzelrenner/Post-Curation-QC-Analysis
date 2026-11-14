@@ -1,5 +1,3 @@
-import os
-
 rule map_hifi_to_assem:
     input:
         fa='{sample}/s2_rename_reorient_fastas/{sample}_Haplome{haplomeNumber}/corrected_fasta/{sample}_Haplome{haplomeNumber}.fa',
