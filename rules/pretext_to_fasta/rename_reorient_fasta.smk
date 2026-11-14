@@ -3,7 +3,7 @@ rule create_uniform_name_for_input_fasta:
         done='{sample}/s1_agp_to_fasta/.agp_to_fasta_done.txt',
     output:
         fa='{sample}/s1_agp_to_fasta/renamed_main_scaffold_file/{sample}.hap{haplomeNumber}.fa',
-        senseCheck='{sample}/s1_agp_to_fasta/renamed_main_scaffold_file/.input_fasta_files.txt,
+        senseCheck='{sample}/s1_agp_to_fasta/renamed_main_scaffold_file/.input_fasta_files.txt'
     params:
         ploidy=lambda w: sampleInfo[w.sample]['ploidy']
     threads:
