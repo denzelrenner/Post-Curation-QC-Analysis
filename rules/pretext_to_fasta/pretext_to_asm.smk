@@ -2,7 +2,7 @@ rule index_scaffold_fasta:
     input:
         fa=lambda w: sampleInfo[w.sample]['scaffold_fasta'],
     output:
-        fai='{sample}/s1_agp_to_fasta/.indexed.txt'
+        fai='{sample}/s1_agp_to_fasta/.input_scaffold_indexed.txt'
     conda:
         "../../envs/mapping-tools.yml"
     resources:
@@ -27,9 +27,9 @@ rule agp_to_fasta:
     input:
         agp=lambda w: sampleInfo[w.sample]['agp'],
         fa=lambda w: sampleInfo[w.sample]['scaffold_fasta'],
-        indexDone='{sample}/s1_agp_to_fasta/.indexed.txt'
+        indexDone='{sample}/s1_agp_to_fasta/.input_scaffold_indexed.txt'
     output:
-        done='{sample}/s1_agp_to_fasta/.done.txt'
+        done='{sample}/s1_agp_to_fasta/.agp_to_fasta_done.txt'
     conda:
         "../../envs/agp-utils.yml"
     params:
@@ -46,6 +46,11 @@ rule agp_to_fasta:
     shell:
         '''
         export PATH=$CONDA_PREFIX/bin:$PATH
+
+        # if output file exists remove it
+        if [ -d {params.outdir} ];then
+            rm -r {params.outdir}
+        fi
 
         # pretext to asm
         pretext-to-asm -a {input.fa} -p {input.agp} -c Chr -o {params.outdir}/{wildcards.sample}.1.fa > {log.out} 2>&1

@@ -2,8 +2,8 @@ import os
 
 rule get_hic:
     output:
-        hic1="{sample}/s4_get_input_data/HiC1/{sample}.hic_1.fq.gz",
-        hic2="{sample}/s4_get_input_data/HiC2/{sample}.hic_2.fq.gz",
+        hic1="{sample}/s4_get_input_reads/HiC1/{sample}.hic_1.fq.gz",
+        hic2="{sample}/s4_get_input_reads/HiC2/{sample}.hic_2.fq.gz",
     params:
         in1=lambda w: sampleInfo[w.sample]["HiC1"],
         in2=lambda w: sampleInfo[w.sample]["HiC2"],

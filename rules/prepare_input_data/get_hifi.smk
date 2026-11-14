@@ -1,7 +1,7 @@
 import os
 rule get_hifi:
     output:
-        fastq="{sample}/s4_get_input_data/Hifi/{sample}.fastq.gz"
+        fastq="{sample}/s4_get_input_reads/Hifi/{sample}.fastq.gz"
     conda:
         "../../envs/mapping-tools.yml"
     threads:

@@ -24,6 +24,10 @@ def set_rule_target():
     # get target files for compleasm dbs
     outFiles.extend(expand(f"{config['compleasm_download_path']}/{{lineage}}.done",lineage=ALLCOMPLEASMLINEAGES))
 
+    # get target files for mapped reads
+    for smp in SAMPLES:
+        outFiles.extend(expand(f"{smp}/s5_map_reads_to_assem/{smp}_Haplome{{hap}}/hifi/{smp}_Haplome{{hap}}_{{suff}}",hap=sampleInfo[smp]['ploidyAsArray'],suff=['hifi_sorted.bam','hifi_sorted.bam.bai','hifi_to_hifiasm.tsv']))
+
     return outFiles
 
 

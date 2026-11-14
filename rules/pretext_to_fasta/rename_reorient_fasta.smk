@@ -1,8 +1,9 @@
 rule create_uniform_name_for_input_fasta:
     input:
-        done='{sample}/s1_agp_to_fasta/.done.txt',
+        done='{sample}/s1_agp_to_fasta/.agp_to_fasta_done.txt',
     output:
         fa='{sample}/s1_agp_to_fasta/renamed_main_scaffold_file/{sample}.hap{haplomeNumber}.fa',
+        senseCheck='{sample}/s1_agp_to_fasta/renamed_main_scaffold_file/.input_fasta_files.txt,
     params:
         ploidy=lambda w: sampleInfo[w.sample]['ploidy']
     threads:
@@ -21,10 +22,13 @@ rule create_uniform_name_for_input_fasta:
         # depending on the ploidy the output fastas look a little different
         if [ "{params.ploidy}" -eq "2" ];then
 
+            ls {wildcards.sample}/s1_agp_to_fasta/{wildcards.sample}.hap{wildcards.haplomeNumber}.1*.fa > {output.senseCheck}
             mv {wildcards.sample}/s1_agp_to_fasta/{wildcards.sample}.hap{wildcards.haplomeNumber}.1*.fa {output.fa}
+            
 
         elif [ "{params.ploidy}" -gt "2" ];then
 
+            ls {wildcards.sample}/s1_agp_to_fasta/{wildcards.sample}.1.hap{wildcards.haplomeNumber}s*.fa > {output.senseCheck}
             mv {wildcards.sample}/s1_agp_to_fasta/{wildcards.sample}.1.hap{wildcards.haplomeNumber}s*.fa {output.fa}
 
         fi
@@ -33,7 +37,6 @@ rule create_uniform_name_for_input_fasta:
 rule align_fasta_to_ref:
     input:
         fa='{sample}/s1_agp_to_fasta/renamed_main_scaffold_file/{sample}.hap{haplomeNumber}.fa',
-        done='{sample}/s1_agp_to_fasta/.done.txt',
     output:
         delta='{sample}/s2_rename_reorient_fastas/{sample}_Haplome{haplomeNumber}/align_fasta_to_ref/output.delta',
     conda:
@@ -78,7 +81,7 @@ rule create_coords_file:
     shell:
         '''
         export PATH=$CONDA_PREFIX/bin:$PATH
-        
+
         # needs python 3.6
         {params.dotPrepScript} --delta {input.delta} --out {wildcards.sample}/s2_rename_reorient_fastas/{wildcards.sample}_Haplome{wildcards.haplomeNumber}/align_fasta_to_ref/output
         '''

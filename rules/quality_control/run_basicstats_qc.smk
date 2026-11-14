@@ -1,26 +1,5 @@
 import os
 
-# get compleasm and gfastats results for all samples, this will become space separated list of input files
-def get_hifiasm_qc_files_all_samples(w):
-
-    # set array of out files
-    outputFiles = []
-
-    # get target hifiasm qc file for all individuals
-    for smp in SAMPLES:
-        
-        # get hifiasm qc outfiles
-        for i in sampleInfo[smp]['hifiasmploidyAsArray']:
-        
-            # create files
-            compleasm=f'{smp}/s4b_run_hifiasm_qc/{smp}.hap{i}/compleasm/summary.txt'
-            gfastats=f'{smp}/s4b_run_hifiasm_qc/{smp}.hap{i}/gfastats/stats.txt'
-
-            # set as target files
-            outputFiles.extend([compleasm,gfastats])
-
-    return outputFiles
-
 rule download_compleasm_lineages:
     output:
         done=f"{config['compleasm_download_path']}/{{lineage_odb}}.done",
@@ -50,8 +29,6 @@ rule download_compleasm_lineages:
 
         compleasm download -L {params.libpath} --odb {params.odb} {params.lineage}
         '''
-
-
 
 rule basicstats_qc_on_individual_haplome:
     input:

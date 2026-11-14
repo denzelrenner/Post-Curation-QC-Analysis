@@ -58,6 +58,7 @@ include:"rules/pretext_to_fasta/rename_reorient_fasta.smk"
 
 ### BASICSTATS QC ###
 include:"rules/quality_control/run_basicstats_qc.smk"
+include:"rules/quality_control/map_hifi_to_assembly.smk"
 
 
 # all rule
