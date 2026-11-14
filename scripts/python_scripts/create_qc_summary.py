@@ -131,7 +131,7 @@ def compleasm_to_df(haplome_name:str,file:str):
     return pd.DataFrame(MainSummaryTable)
 
 # make pairs of sample and haplome number
-sample_haplome = [(args.sample,args.haplomeNames)]
+sample_haplome = [(args.sample[0],args.haplomeNames)]
 
 # run different analysis depending on if we have a single sample or many
 if len(sample_haplome) == 1:
@@ -148,7 +148,7 @@ if len(sample_haplome) == 1:
             haplome = f'{s}.hap{i}'
 
             # get chrom sizes df
-            chromSizes = get_chromosome_sizes(haplome_name=haplome,file=f'{s}/s3_basic_stats_qc/{s}_Haplome{i}.fa')
+            chromSizes = get_chromosome_sizes(haplome_name=haplome,file=f'{s}/s2_rename_reorient_fastas/{s}_Haplome{i}/corrected_fasta/{s}_Haplome{i}.fa')
 
             # get gfastats df
             gfastats = gfastats_to_df(haplome_name=haplome,file=f'{s}/s3_basic_stats_qc/{s}_Haplome{i}/gfastats/stats.txt')

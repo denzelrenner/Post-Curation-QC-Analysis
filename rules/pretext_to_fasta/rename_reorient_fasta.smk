@@ -80,7 +80,7 @@ rule create_coords_file:
         export PATH=$CONDA_PREFIX/bin:$PATH
         
         # needs python 3.6
-        {params.dotPrepScript} --delta {output.delta} --out {wildcards.sample}/s2_rename_reorient_fastas/{wildcards.sample}_Haplome{wildcards.haplomeNumber}/align_fasta_to_ref/output
+        {params.dotPrepScript} --delta {input.delta} --out {wildcards.sample}/s2_rename_reorient_fastas/{wildcards.sample}_Haplome{wildcards.haplomeNumber}/align_fasta_to_ref/output
         '''
 
 rule rename_reorient_fasta:
