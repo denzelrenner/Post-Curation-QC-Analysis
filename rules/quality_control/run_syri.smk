@@ -16,9 +16,6 @@ def get_syri_comparisons(w):
     # create pairwise file comparisions
     pairwise_comparisons = itertools.pairwise(comparisonFiles)
 
-    print(pairwise_comparisons)
-    for tup in pairwise_comparisons:
-        print(tup)
     return [f'{ref}_{query}' for tup in pairwise_comparisons for ref,query in tup]
 
 def create_genomes_txt(w):
