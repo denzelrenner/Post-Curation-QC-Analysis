@@ -1,6 +1,7 @@
 rule map_hifi_to_assem:
     input:
         fa='{sample}/s2_rename_reorient_fastas/{sample}_Haplome{haplomeNumber}/corrected_fasta/{sample}_Haplome{haplomeNumber}.fa',
+        fai='{sample}/s2_rename_reorient_fastas/{sample}_Haplome{haplomeNumber}/corrected_fasta/{sample}_Haplome{haplomeNumber}.fa.fai',
         hifi="{sample}/s4_get_input_reads/Hifi/{sample}.fastq.gz"
     output:
         bam='{sample}/s5_map_reads_to_assem/{sample}_Haplome{haplomeNumber}/hifi/{sample}_Haplome{haplomeNumber}_hifi_sorted.bam',
