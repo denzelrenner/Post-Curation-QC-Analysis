@@ -60,6 +60,9 @@ include:"rules/pretext_to_fasta/rename_reorient_fasta.smk"
 include:"rules/quality_control/run_basicstats_qc.smk"
 include:"rules/quality_control/map_hifi_to_assembly.smk"
 
+### SYRI ###
+include:"rules/quality_control/run_syri.smk"
+
 
 # all rule
 rule all:
