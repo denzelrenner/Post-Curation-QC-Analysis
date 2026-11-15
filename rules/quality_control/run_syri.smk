@@ -3,37 +3,31 @@ def get_syri_comparisons(w):
 
     # set out command var
     outCommands = []
-
-    # get full list of comparison files
-    comparisonFiles = [sampleInfo[w.sample]['reference_fasta'] + '_'] 
     
     # get input population fastas
     inputFastas = expand(f'{w.sample}/s2_rename_reorient_fastas/{w.sample}_Haplome{{hap}}/corrected_fasta/{w.sample}_Haplome{{hap}}.fa',hap=sampleInfo[w.sample]['ploidyAsArray'])
 
     # add _ to everything but the last element
-    inputFastas = [f'{inputFastas[i]}_' for i in range(len(inputFastas))]
+    inputFastas = [f'{inputFastas[i]}' for i in range(len(inputFastas))]
 
     # add input fasta to comparison list
-    comparisonFiles = comparisonFiles + inputFastas
+    comparisonFiles = [sampleInfo[w.sample]['reference_fasta']]  + inputFastas
 
     # create pairwise file comparisions
     pairwise_comparisons = itertools.pairwise(comparisonFiles)
 
-    return [c.rstrip('_') for c in pairwise_comparisons]
+    return [f'{ref}_{query}' for tup in pairwise_comparisons for ref,query in tup]
 
 def create_genomes_txt(w):
 
     # out text var
     outText = ''
-
-    # get full list of comparison files
-    comparisonFiles = [sampleInfo[w.sample]['reference_fasta'] + '_'] 
     
     # get input population fastas
     inputFastas = expand(f'{w.sample}/s2_rename_reorient_fastas/{w.sample}_Haplome{{hap}}/corrected_fasta/{w.sample}_Haplome{{hap}}.fa',hap=sampleInfo[w.sample]['ploidyAsArray'])
 
     # combine lists
-    comparisonFiles = comparisonFiles + inputFastas
+    comparisonFiles = [sampleInfo[w.sample]['reference_fasta']]  + inputFastas
 
     # loop through everything and add their string that will go in the file
     for genomeFasta in comparisonFiles:
