@@ -186,7 +186,7 @@ rule run_plotsr:
     input:
         '{sample}/s6_run_syri/run_syri/.done.txt',
     output:
-        '{sample}/s6_run_syri/generate_synteny_plot/{wildcards.sample}_ref_haps_synteny_plot.pdf',
+        '{sample}/s6_run_syri/generate_synteny_plot/{sample}_ref_haps_synteny_plot.pdf',
     resources:
         runtime=480,
         mem_mb=150000
