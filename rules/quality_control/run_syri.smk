@@ -16,6 +16,9 @@ def get_syri_comparisons(w):
     # create pairwise file comparisions
     pairwise_comparisons = itertools.pairwise(comparisonFiles)
 
+    print(pairwise_comparisons)
+    for tup in pairwise_comparisons:
+        print(tup)
     return [f'{ref}_{query}' for tup in pairwise_comparisons for ref,query in tup]
 
 def create_genomes_txt(w):
@@ -82,7 +85,7 @@ rule pairwise_align_for_syri:
     threads:
         int(workflow.cores * 0.5)
     params:
-        comparisions=get_syri_comparisons,
+        comparisons=get_syri_comparisons,
         mainOutdir='{sample}/s6_run_syri/pairwise_alignments'
     conda:
         "../../envs/mapping-tools.yml"
@@ -134,7 +137,7 @@ rule run_syri:
         runtime=480,
         mem_mb=150000,
     params:
-        comparisions=get_syri_comparisons,
+        comparisons=get_syri_comparisons,
         mainOutdir='{sample}/s6_run_syri/run_syri',
     threads:
         int(workflow.cores * 0.5)
