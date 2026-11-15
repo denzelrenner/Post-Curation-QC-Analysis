@@ -50,6 +50,7 @@ rule agp_to_fasta:
         # if output file exists remove it
         if [ -d {params.outdir} ];then
             rm -r {params.outdir}
+            mkdir -p {params.outdir}
         fi
 
         # pretext to asm
