@@ -1,14 +1,11 @@
 import itertools
 def get_syri_comparisons(w):
 
-    # set out command var
-    outCommands = []
+    # set out genomes
+    outGenomes = []
     
     # get input population fastas
-    inputFastas = expand(f'{w.sample}/s2_rename_reorient_fastas/{w.sample}_Haplome{{hap}}/corrected_fasta/{w.sample}_Haplome{{hap}}.fa',hap=sampleInfo[w.sample]['ploidyAsArray'])
-
-    # add _ to everything but the last element
-    inputFastas = [f'{inputFastas[i]}' for i in range(len(inputFastas))]
+    inputFastas = expand(f'{SNAKEMAKE_OUTPUTDIR}/{w.sample}/s2_rename_reorient_fastas/{w.sample}_Haplome{{hap}}/corrected_fasta/{w.sample}_Haplome{{hap}}.fa',hap=sampleInfo[w.sample]['ploidyAsArray'])
 
     # add input fasta to comparison list
     comparisonFiles = [sampleInfo[w.sample]['reference_fasta']]  + inputFastas
@@ -16,7 +13,11 @@ def get_syri_comparisons(w):
     # create pairwise file comparisions
     pairwise_comparisons = itertools.pairwise(comparisonFiles)
 
-    return [f'{ref}_{query}' for tup in pairwise_comparisons for ref,query in tup]
+    for tup in pairwise_comparisons:
+        ref,query = tup
+        outGenomes.append(f'{ref}:{query}')        
+
+    return outGenomes
 
 def create_genomes_txt(w):
 
@@ -24,7 +25,7 @@ def create_genomes_txt(w):
     outText = ''
     
     # get input population fastas
-    inputFastas = expand(f'{w.sample}/s2_rename_reorient_fastas/{w.sample}_Haplome{{hap}}/corrected_fasta/{w.sample}_Haplome{{hap}}.fa',hap=sampleInfo[w.sample]['ploidyAsArray'])
+    inputFastas = expand(f'{SNAKEMAKE_OUTPUTDIR}/{w.sample}/s2_rename_reorient_fastas/{w.sample}_Haplome{{hap}}/corrected_fasta/{w.sample}_Haplome{{hap}}.fa',hap=sampleInfo[w.sample]['ploidyAsArray'])
 
     # combine lists
     comparisonFiles = [sampleInfo[w.sample]['reference_fasta']]  + inputFastas
@@ -55,7 +56,7 @@ def get_syri_plotsr_sr_parameter(w):
     for c in comparisons:
 
         # get individual ref, query fastas
-        refFa,queryFa = c.split('_')
+        refFa,queryFa = c.split(':')
 
         # get name for haplome
         refName,queryName = refFa.split('/')[-1].removesuffix('.fa'),queryFa.split('/')[-1].removesuffix('.fa')
@@ -64,7 +65,7 @@ def get_syri_plotsr_sr_parameter(w):
         comparison = f"{refName}_{queryName}"
 
         # get the out file
-        outFile = f"--sr {w.sample}/s6_run_syri/run_syri/{comparison}/{comparison}syri.out "
+        outFile = f"--sr {SNAKEMAKE_OUTPUTDIR}/{w.sample}/s6_run_syri/run_syri/{comparison}/{comparison}syri.out "
 
         # add to parameter var
         srParameter += outFile
@@ -100,27 +101,23 @@ rule pairwise_align_for_syri:
         for c in {params.comparisons};do
 
             # assign hap 1 and 2 to variables by splitting input string
-            IFS='_' read -r ref_fa query_fa <<< $c
+            IFS=':' read -r ref_fa query_fa <<< $c
 
-            ref_prefix=$(basename ${{hap1_raw}} .fa)
-            query_prefix=$(basename ${{hap2_raw}} .fa)
+            ref_prefix=$(basename ${{ref_fa}} .fa)
+            query_prefix=$(basename ${{query_fa}} .fa)
 
             # make outdir
             comparison="${{ref_prefix}}_${{query_prefix}}"
             outdir={params.mainOutdir}/$comparison
             mkdir -p $outdir
-            cd $outdir
 
             # run minimap command
-            minimap2 -ax asm5 -t {threads} --eqx $ref_fa $query_fa | samtools sort -@ {threads} -O BAM - > "${{comparison}}.bam"
+            minimap2 -ax asm5 -t {threads} --eqx $ref_fa $query_fa | samtools sort -@ {threads} -O BAM - > "${{outdir}}/${{comparison}}.bam"
             
             # index bam
-            samtools index "${{comparison}}.bam"
+            samtools index "${{outdir}}/${{comparison}}.bam"
 
         done
-
-        # move into main outdir
-        cd {params.mainOutdir}
 
         echo 'done' > {output}
         '''
@@ -132,10 +129,11 @@ rule run_syri:
         '{sample}/s6_run_syri/run_syri/.done.txt',
     resources:
         runtime=480,
-        mem_mb=150000,
+        mem_mb=50000,
     params:
         comparisons=get_syri_comparisons,
         mainOutdir='{sample}/s6_run_syri/run_syri',
+        snakeOutdir=SNAKEMAKE_OUTPUTDIR,
     threads:
         int(workflow.cores * 0.5)
     conda:
@@ -154,26 +152,28 @@ rule run_syri:
         for c in {params.comparisons};do
 
             # assign hap 1 and 2 to variables by splitting input string
-            IFS='_' read -r ref_fa query_fa <<< $c
+            IFS=':' read -r ref_fa query_fa <<< $c
 
-            ref_prefix=$(basename ${{hap1_raw}} .fa)
-            query_prefix=$(basename ${{hap2_raw}} .fa)
+            ref_prefix=$(basename ${{ref_fa}} .fa)
+            query_prefix=$(basename ${{query_fa}} .fa)
 
             # make outdir
             comparison="${{ref_prefix}}_${{query_prefix}}"
             outdir={params.mainOutdir}/$comparison
             mkdir -p $outdir
-            cd $outdir
+
+            # create symbolic link of bam file and fasta to working dir, syri needs all input files to be in wd
+            ln -s $ref_fa "${{outdir}}/${{ref_prefix}}.fa"
+            ln -s $query_fa "${{outdir}}/${{query_prefix}}.fa"
+            ln -s "{params.snakeOutdir}/{wildcards.sample}/s6_run_syri/pairwise_alignments/${{comparison}}/${{comparison}}.bam" "${{outdir}}/${{comparison}}.bam"
+            ln -s "{params.snakeOutdir}/{wildcards.sample}/s6_run_syri/pairwise_alignments/${{comparison}}/${{comparison}}.bam.bai" "${{outdir}}/${{comparison}}.bam.bai"
 
             # run syri
-            syri -c $outdir/"${{comparison}}.bam" --nc {threads} -r $ref_fa -q $query_fa -k -F B --prefix $comparison
+            syri -c "${{outdir}}/${{comparison}}.bam" --nc {threads} -r "${{outdir}}/${{ref_prefix}}.fa" -q "${{outdir}}/${{query_prefix}}.fa" -k -F B --prefix $comparison --dir $outdir
 
         done
 
-        # move into main outdir
-        cd {params.mainOutdir}
-
-        echo 'done' > {output}    	
+        echo 'done' > {output}
         '''
 
 rule run_plotsr:
@@ -182,8 +182,8 @@ rule run_plotsr:
     output:
         '{sample}/s6_run_syri/generate_synteny_plot/{sample}_ref_haps_synteny_plot.pdf',
     resources:
-        runtime=480,
-        mem_mb=150000
+        runtime=60,
+        mem_mb=30000
     threads:
         int(workflow.cores * 0.5)
     conda:
