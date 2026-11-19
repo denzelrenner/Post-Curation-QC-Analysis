@@ -63,6 +63,9 @@ include:"rules/quality_control/map_hifi_to_assembly.smk"
 ### SYRI ###
 include:"rules/quality_control/run_syri.smk"
 
+### OVERLAY GAPS ###
+include:"rules/overlay_gaps/find_gaps.smk"
+
 
 # all rule
 rule all:
