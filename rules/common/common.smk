@@ -23,6 +23,10 @@ def set_rule_target():
         # mapped reads target file
         outFiles.extend(expand(f"{smp}/s5_map_reads_to_assem/{smp}_Haplome{{hap}}/hifi/{smp}_Haplome{{hap}}_{{suff}}",hap=sampleInfo[smp]['ploidyAsArray'],suff=['hifi_sorted.bam','hifi_sorted.bam.bai','hifi_to_hifiasm.tsv']))
 
+        # gap positions target file
+        outFiles.extend(expand(f'{smp}/s7_overlay_gaps/{smp}_Haplome{{hap}}/{smp}_Haplome{{hap}}_gap_positions.tsv',hap=sampleInfo[smp]['ploidyAsArray']))
+
+
     # get target files for compleasm dbs
     outFiles.extend(expand(f"{config['compleasm_download_path']}/{{lineage}}.done",lineage=ALLCOMPLEASMLINEAGES))
 
